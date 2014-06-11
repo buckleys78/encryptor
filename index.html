@@ -10,36 +10,68 @@
     <textarea id="message" rows="6" cols="60"></textarea>
     <br>
     <button id="encrypt">Lock Down</button>
+    <button id="decrypt">Unlock</button>
 
     <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
 
     <script>
+      document.getElementById('encrypt').onclick = function() {encoder.protect();}
+      document.getElementById('decrypt').onclick = function() {decoder.decode();}
+
       var encoder = {
         setMessage: function() {
-
+          encoder.message = document.getElementById('message').value;
         },
         getPassword: function() {
-
+          encoder.password = prompt ("Enter your encription password: ")
         },
         setUrl: function() {
-
+          var oldUrl = window.location.toLocaleString();
+          encoder.newUrl  = oldUrl + "?Hash=" + encoder.encrypt();
         },
-        replaceMessageWithUrl: function () {
-
+        replaceMessageWithUrl: function() {
+          document.getElementById('message').value = encoder.newUrl;
         },
         encrypt: function() {
-          cypher = CryptoJS.AES.encrypt(this.message, this.password)
+          cypher = CryptoJS.AES.encrypt(encoder.message, encoder.password)
           console.log("Verified: " +
-            CryptoJS.AES.decrypt(cypher, this.password).toString(CryptoJS.enc.Utf8))
+            CryptoJS.AES.decrypt(cypher, encoder.password).toString(CryptoJS.enc.Utf8))
           return cypher
         },
         protect: function() {
-          this.setMessage()
-          this.getPassword()
-          this.setUrl()
-          this.replaceMessageWithUrl()
+          encoder.setMessage()
+          encoder.getPassword()
+          encoder.setUrl()
+          encoder.replaceMessageWithUrl()
         }
       }
+
+      var decoder = {
+        getPassword: function() {
+          decoder.password = prompt ("Enter your decription password: ")
+        },
+        parseUrl: function() {
+          decoder.encryption = window.location.search.substring(6);
+          console.log(decoder.encryption)
+        },
+        replaceUrlWithMessage: function() {
+          document.getElementById('message').value = decoder.decrypt();
+        },
+        decrypt: function() {
+          decypher = CryptoJS.AES.decrypt(decoder.encryption, decoder.password).toString(CryptoJS.enc.Utf8)
+
+          console.log("Verified: " +
+            CryptoJS.AES.decrypt(decypher, decoder.password).toString(CryptoJS.enc.Utf8))
+
+          return decypher
+        },
+        decode: function() {
+          decoder.getPassword()
+          decoder.parseUrl()
+          decoder.replaceUrlWithMessage()
+        }
+      }
+
     </script>
   </body>
 </html>
